@@ -33,23 +33,34 @@ jobs:
             pkg-config \
             make \
             zip \
-            unzip
+            unzip \
+            wget
 
     - name: Install Buildozer and Cython
       run: |
         python -m pip install --upgrade pip
         pip install --upgrade setuptools==65.5.0 cython buildozer
 
-    - name: Pre-create Android SDK License Files
+    - name: Setup Android SDK Tools & Licenses for Buildozer
       run: |
-        mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
-        echo "84831b4009ab44a7f6430da4b82caeb83ac6f6e" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-        echo "2433034e365696d5b058f8849b062534571cd014" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-        echo "d56f518747f45122f81500cef3e32e316a5a060b" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-        echo "286e3cedb915d26f714c5b364e7c7a1950e8d328" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-        echo "33b6a2b64607f11b759f3804ebc9824a8c0f5f8b" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-        echo "e9ac7c35d2630cb37d6e4b85558fc899f8d16fb6" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-        echo "7433ba104b7f6cee3165ad101baade32a764d7ee" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+        mkdir -p ~/.buildozer/android/platform/android-sdk
+        cd ~/.buildozer/android/platform/android-sdk
+        
+        # Télécharge les outils de ligne de commande Google
+        wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O cmdtools.zip
+        unzip -q cmdtools.zip
+        
+        # Place les outils dans 'tools' pour que Buildozer trouve tools/bin/sdkmanager
+        rm -rf tools
+        mv cmdline-tools tools
+        rm cmdtools.zip
+
+        # Pré-valide toutes les licences SDK nécessaires
+        mkdir -p licenses
+        echo "84831b4009ab44a7f6430da4b82caeb83ac6f6e" > licenses/android-sdk-license
+        echo "2433034e365696d5b058f8849b062534571cd014" >> licenses/android-sdk-license
+        echo "d56f518747f45122f81500cef3e32e316a5a060b" >> licenses/android-sdk-license
+        echo "286e3cedb915d26f714c5b364e7c7a1950e8d328" >> licenses/android-sdk-license
 
     - name: Build APK with Buildozer
       run: |
@@ -60,4 +71,3 @@ jobs:
       with:
         name: package
         path: bin/*.apk
-        
