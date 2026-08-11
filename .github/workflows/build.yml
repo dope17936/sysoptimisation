@@ -33,34 +33,33 @@ jobs:
             pkg-config \
             make \
             zip \
-            unzip
+            unzip \
+            wget
 
     - name: Install Buildozer and Cython
       run: |
         python -m pip install --upgrade pip
         pip install --upgrade setuptools==65.5.0 cython buildozer
 
+    - name: Prepare Android SDK Tools & Licenses
+      run: |
+        mkdir -p ~/.buildozer/android/platform/android-sdk/tools
+        cd ~/.buildozer/android/platform/android-sdk
+        wget -q https://dl.google.com/android/repository/commandlinetools-linux-9477386_latest.zip -O commandlinetools.zip
+        unzip -q commandlinetools.zip
+        mkdir -p tools/bin
+        mv cmdline-tools/bin/* tools/bin/
+        mv cmdline-tools/lib tools/
+        rm -rf cmdline-tools commandlinetools.zip
+        
+        # Pré-valide toutes les licences pour éviter les blocages
+        mkdir -p licenses
+        echo "84831b4009ab44a7f6430da4b82caeb83ac6f6e" > licenses/android-sdk-license
+        echo "2433034e365696d5b058f8849b062534571cd014" >> licenses/android-sdk-license
+        echo "d56f518747f45122f81500cef3e32e316a5a060b" >> licenses/android-sdk-license
+
     - name: Build APK with Buildozer
       run: |
-        # Crée les dossiers et injecte les licences immédiatement et en boucle
-        mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
-        echo "84831b4009ab44a7f6430da4b82caeb83ac6f6e" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-        echo "2433034e365696d5b058f8849b062534571cd014" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-        echo "d56f518747f45122f81500cef3e32e316a5a060b" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-        echo "286e3cedb915d26f714c5b364e7c7a1950e8d328" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-
-        (
-          while true; do
-            mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
-            echo "84831b4009ab44a7f6430da4b82caeb83ac6f6e" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-            echo "2433034e365696d5b058f8849b062534571cd014" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-            echo "d56f518747f45122f81500cef3e32e316a5a060b" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-            echo "286e3cedb915d26f714c5b364e7c7a1950e8d328" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-            sleep 1
-          done
-        ) &
-        
-        # Lance la compilation
         buildozer -v android debug
 
     - name: Upload APK Artifact
