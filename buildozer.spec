@@ -1,5 +1,7 @@
 [app]
 
+source.dir = .
+
 # (str) Titre de ton application
 title = Trading Money
 
