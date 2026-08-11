@@ -16,6 +16,9 @@ jobs:
       with:
         python-version: '3.10'
 
+    - name: Set up Android SDK
+      uses: android-actions/setup-android@v3
+
     - name: Install system dependencies
       run: |
         sudo apt-get update
@@ -40,12 +43,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install --upgrade setuptools==65.5.0 cython buildozer
 
-    - name: Pre-accept Android SDK Licenses
+    - name: Link Android SDK for Buildozer
       run: |
-        mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
-        echo "84831b4009ab44a7f6430da4b82caeb83ac6f6e" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-        echo "2433034e365696d5b058f8849b062534571cd014" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
-        echo "d56f518747f45122f81500cef3e32e316a5a060b" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+        mkdir -p ~/.buildozer/android/platform
+        ln -s $ANDROID_SDK_ROOT ~/.buildozer/android/platform/android-sdk
 
     - name: Build APK with Buildozer
       run: |
