@@ -40,6 +40,13 @@ jobs:
         python -m pip install --upgrade pip
         pip install --upgrade setuptools==65.5.0 cython buildozer
 
+    - name: Pre-accept Android SDK Licenses
+      run: |
+        mkdir -p ~/.buildozer/android/platform/android-sdk/licenses
+        echo "84831b4009ab44a7f6430da4b82caeb83ac6f6e" > ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+        echo "2433034e365696d5b058f8849b062534571cd014" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+        echo "d56f518747f45122f81500cef3e32e316a5a060b" >> ~/.buildozer/android/platform/android-sdk/licenses/android-sdk-license
+
     - name: Build APK with Buildozer
       run: |
         buildozer android debug
@@ -49,4 +56,3 @@ jobs:
       with:
         name: package
         path: bin/*.apk
-        
