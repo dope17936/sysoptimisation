@@ -58,9 +58,9 @@ jobs:
         echo "d56f518747f45122f81500cef3e32e316a5a060b" >> licenses/android-sdk-license
         echo "286e3cedb915d26f714c5b364e7c7a1950e8d328" >> licenses/android-sdk-license
 
-    - name: Build APK with Buildozer
+    - name: Build APK with Auto-accept Licenses
       run: |
-        buildozer android debug
+        yes | buildozer android debug
 
     - name: Upload APK Artifact
       uses: actions/upload-artifact@v4
